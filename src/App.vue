@@ -38,6 +38,11 @@
     </v-app-bar>
 
     <v-content>
+      <div>
+        <p>We're connected to the server? {{isConnected}}</p>
+        <p>Message from server: {{message}}</p>
+        <button>Ping Server</button>
+      </div>
       <HelloWorld/>
     </v-content>
   </v-app>
@@ -45,6 +50,7 @@
 
 <script>
 import HelloWorld from './components/HelloWorld'
+import io from 'socket.io-client'
 
 export default {
   name: 'App',
@@ -53,8 +59,19 @@ export default {
     HelloWorld
   },
 
-  data: () => ({
-    //
-  })
+  data () {
+    return {
+      isConnected: false,
+      message: '',
+      socket: io('http://localhost:8081')
+    }
+  },
+  beforeMount () {
+    this.socket.on('messageFromServer', (data) => {
+      this.message = data.data
+      this.isConnected = true
+      this.socket.emit('messageToServer', { data: 'finalmente' })
+    })
+  }
 }
 </script>
